@@ -44,20 +44,46 @@ public class MainActivity extends AppCompatActivity {
             tvProgress.setText(progress + "%");
             if (progress == 100) {
                 button.setText("开始");
-                Bitmap bm = BitmapFactory.decodeFile(getCacheDir() + File.separator + "IntentService.png");
-                // 以下解决图片太大不显示的问题
-                DisplayMetrics dm = new DisplayMetrics();
-                getWindowManager().getDefaultDisplay().getMetrics(dm);
-                int screenWidth = dm.widthPixels;
-                if(bm.getWidth() <= screenWidth){
-                    imageView.setImageBitmap(bm);
-                }else{
-                    Bitmap bmp= Bitmap.createScaledBitmap(bm, screenWidth, bm.getHeight() * screenWidth / bm.getWidth(), true);
-                    imageView.setImageBitmap(bmp);
-                }
+                final BitmapFactory.Options options = new BitmapFactory.Options();
+                options.inJustDecodeBounds = true;
+                BitmapFactory.decodeFile(getCacheDir() + File.separator + "IntentService.png", options);
+                // calculate inSampleSize
+                options.inSampleSize = calculateInSampleSize(options, imageView.getWidth(), imageView.getHeight());
+                // Decode bitmap with inSampleSize set
+                options.inJustDecodeBounds = false;
+                Bitmap bm = BitmapFactory.decodeFile(getCacheDir() + File.separator + "IntentService.png", options);
+                imageView.setImageBitmap(bm);
+
+//                Bitmap bm = BitmapFactory.decodeFile(getCacheDir() + File.separator + "IntentService.png");
+//                // 以下解决图片太大不显示的问题
+//                DisplayMetrics dm = new DisplayMetrics();
+//                getWindowManager().getDefaultDisplay().getMetrics(dm);
+//                int screenWidth = dm.widthPixels;
+//                if(bm.getWidth() <= screenWidth){
+//                    imageView.setImageBitmap(bm);
+//                }else{
+//                    Bitmap bmp= Bitmap.createScaledBitmap(bm, screenWidth, bm.getHeight() * screenWidth / bm.getWidth(), true);
+//                    imageView.setImageBitmap(bmp);
+//                }
             }
         }
     };
+
+    private int calculateInSampleSize(BitmapFactory.Options options, int imageViewWidth, int imageViewHeight) {
+        final int height = options.outHeight;
+        final int width = options.outWidth;
+        int inSampelSize = 1;
+        if (height > imageViewHeight || width > imageViewWidth) {
+            final int halfHeight = height / 2;
+            final int halfWidth = width / 2;
+            while ((halfHeight / inSampelSize) >= imageViewHeight
+                    && (halfWidth / inSampelSize) >= imageViewWidth) {
+                inSampelSize *= 2;
+            }
+        }
+
+        return inSampelSize;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -102,6 +128,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void start(View view) {
         button.setText("下载中");
+        imageView.setImageBitmap(null);
         startService(DownloadService.newIntent(this, url));
     }
 
