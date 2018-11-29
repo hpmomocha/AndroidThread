@@ -1,0 +1,4 @@
+# AndroidThread
+Android的线程和线程池
+
+AsyncTask，HandlerThread以及IntentService
