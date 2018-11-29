@@ -1,0 +1,12 @@
+def butterKnifeVersion = "8.5.1"
+def okhttp3Version = "3.12.0"
+def okioVersion = "2.1.0"
+
+project.ext {
+    dependencies = [
+            "butterknife"                 : "com.jakewharton:butterknife:${butterKnifeVersion}",
+            "butterknife-compiler"        : "com.jakewharton:butterknife-compiler:${butterKnifeVersion}",
+            "okhttp3"                     : "com.squareup.okhttp3:okhttp:${okhttp3Version}",
+            "okio"                        : "com.squareup.okio:okio:${okioVersion}"
+            ]
+}
