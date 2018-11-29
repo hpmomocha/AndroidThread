@@ -45,6 +45,7 @@ public class MainActivity extends AppCompatActivity {
             if (progress == 100) {
                 button.setText("开始");
                 final BitmapFactory.Options options = new BitmapFactory.Options();
+                // 将BitmapFactory.Options的inJustDecodeBounds参数设为true并加载图片。
                 options.inJustDecodeBounds = true;
                 BitmapFactory.decodeFile(getCacheDir() + File.separator + "IntentService.png", options);
                 // calculate inSampleSize
@@ -70,9 +71,16 @@ public class MainActivity extends AppCompatActivity {
     };
 
     private int calculateInSampleSize(BitmapFactory.Options options, int imageViewWidth, int imageViewHeight) {
+        // 从BitmapFactory。Options中取出图片的原始宽高信息，它们对应于outWidth和outHeight参数。
         final int height = options.outHeight;
         final int width = options.outWidth;
         int inSampelSize = 1;
+        // 根据采样率规则并结合目标View的所需大小计算出采样率inSampleSize。
+        // 当采样率为1时，采样后的图片大小为图片的原始大小，当inSampleSize大于1时，比如为2，
+        // 那么采样后的图片其宽/高均为原图大小的1/2，而像素数为原图的1/4，其占有的内存大小也为原图的1/4。
+        // inSampleSize的取值应该总是为2的指数。如果外界传递给系统的inSampleSize不为2的指数，
+        // 那么系统会向下取整并选择一个最接近的2的指数来代替。
+        // 但是经过验证发现这个结论并非在所有的Android版本上都成立，因此把它当成一个开发建议即可。
         if (height > imageViewHeight || width > imageViewWidth) {
             final int halfHeight = height / 2;
             final int halfWidth = width / 2;
